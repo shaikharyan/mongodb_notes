@@ -1,0 +1,1536 @@
+1.go to mongodb file->bin->open in cmd->run command i.e mongod --version
+2.mongosh->mongo shell server
+3.show dbs or show databases
+-------------------------------------------------------------------------------------------------------------------------------------------------
+4.Create student database
+ use students
+show dbs
+show collections
+db.createCollection('data')->create collection in student db->O/P:{ ok: 1 }
+show collections->O/P:data
+show dbs->Finally we see student db->O/P:students
+db.data.drop()->Drop/Delete data Collection->O/P:Nothing show
+db.dropDatabase()->Delete student Database->O/P:{ ok: 1, dropped: 'students' }
+------------------------------------------------------------------------------------------------------------------------------------------------
+cls->clear
+------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------
+Insertion Operation
+------------------------------------------------------------------------------------------------------------------------------------------------
+//Insert Data:
+1.InsertOne:
+students> db.data.insertOne({'name':'Aryan',age:22})
+O/P:
+{
+  acknowledged: true,
+  insertedId: ObjectId("65cb22f5706e57b02829bd98")
+}
+----------------------------------------------------------
+//2.InsertMany
+students> db.data.insertMany([{'name':'Aryan',age:22},{'name':'Sonu',age:23},{'name':'Arshiyan',age:21}])
+//O/P:
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId("65cb23d1706e57b02829bd99"),
+    '1': ObjectId("65cb23d1706e57b02829bd9a"),
+    '2': ObjectId("65cb23d1706e57b02829bd9b")
+  }
+}
+
+---------------------------------------------------------
+//To see documents of the particular collection
+students> db.data.find()
+//O/P:
+[
+  { _id: ObjectId("65cb22f5706e57b02829bd98"), name: 'Aryan', age: 22 },
+  { _id: ObjectId("65cb23d1706e57b02829bd99"), name: 'Aryan', age: 22 },
+  { _id: ObjectId("65cb23d1706e57b02829bd9a"), name: 'Sonu', age: 23 },
+  {
+    _id: ObjectId("65cb23d1706e57b02829bd9b"),
+    name: 'Arshiyan',
+    age: 21
+  }
+]
+------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
+Insert Operation->//Duplicate key error
+------------------------------------------------------------------------------------------------------
+students> db.data.insertMany([{'name':'Arshiyan',age:23},{'name':'Aryan',age:22},{'name':'Aryan',age:22}])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId("65cb3b51d48d38cbe39d71a4"),
+    '1': ObjectId("65cb3b51d48d38cbe39d71a5"),
+    '2': ObjectId("65cb3b51d48d38cbe39d71a6")
+  }
+}
+----------------------------------------------------------------
+//Duplicate key error
+students> db.data.insertMany([{'name':'Arshiyan',age:23},{_id:ObjectId("65cb35b51d48d38cbe39d71a5"),'name':'Aryan',age:22},{'name':'Aryan',age:22}])
+//O/P:
+BSONError: Argument passed in must be a string of 12 bytes or a string of 24 hex characters or an integer
+students> db.data.insertMany([{'name':'Arshiyan',age:23},{_id:ObjectId("65cb3b51d48d38cbe39d71a5"),'name':'Aryan',age:22},{'name':'Aryan',age:22}])
+Uncaught:
+MongoBulkWriteError: E11000 duplicate key error collection: students.data index: _id_ dup key: { _id: ObjectId('65cb3b51d48d38cbe39d71a5') }
+Result: BulkWriteResult {
+  insertedCount: 1,
+  matchedCount: 0,
+  modifiedCount: 0,
+  deletedCount: 0,
+  upsertedCount: 0,
+  upsertedIds: {},
+  insertedIds: {
+    '0': ObjectId("65cb3cbcd48d38cbe39d71a7"),
+    '1': ObjectId("65cb3b51d48d38cbe39d71a5"),
+    '2': ObjectId("65cb3cbcd48d38cbe39d71a8")
+  }
+}
+Write Errors: [
+  WriteError {
+    err: {
+      index: 1,
+      code: 11000,
+      errmsg: "E11000 duplicate key error collection: students.data index: _id_ dup key: { _id: ObjectId('65cb3b51d48d38cbe39d71a5') }",
+      errInfo: undefined,
+      op: {
+        _id: ObjectId("65cb3b51d48d38cbe39d71a5"),
+        name: 'Aryan',
+        age: 22
+      }
+    }
+  }
+]
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+//Use ordered->if error come at id 2 then further id can be inserted without fail->without ordered it will stop inserting when error come
+students> db.data.insertMany([{'name':'Arshiyan',age:23},{_id:ObjectId("65cb3b51d48d38cbe39d71a5"),'name':'Aryan',age:22},{'name':'Aryan',age:22}],{ordered:false})
+//O/P:
+Uncaught:
+MongoBulkWriteError: E11000 duplicate key error collection: students.data index: _id_ dup key: { _id: ObjectId('65cb3b51d48d38cbe39d71a5') }
+Result: BulkWriteResult {
+  insertedCount: 2,
+  matchedCount: 0,
+  modifiedCount: 0,
+  deletedCount: 0,
+  upsertedCount: 0,
+  upsertedIds: {},
+  insertedIds: {
+    '0': ObjectId("65cb3ce4d48d38cbe39d71a9"),
+    '1': ObjectId("65cb3b51d48d38cbe39d71a5"),
+    '2': ObjectId("65cb3ce4d48d38cbe39d71aa")
+  }
+}
+Write Errors: [
+  WriteError {
+    err: {
+      index: 1,
+      code: 11000,
+      errmsg: "E11000 duplicate key error collection: students.data index: _id_ dup key: { _id: ObjectId('65cb3b51d48d38cbe39d71a5') }",
+      errInfo: undefined,
+      op: {
+        _id: ObjectId("65cb3b51d48d38cbe39d71a5"),
+        name: 'Aryan',
+        age: 22
+      }
+    }
+  }
+]
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+//Special Character->space in given in course name->write in ' ' between this quotes.
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+students> db.data.insertMany([{'name':'Arshiyan',age:23,'course name':'IT'},{'name':'Aryan',age:22},{'name':'Aryan',age:22}])
+{
+  acknowledged: true,
+  insertedIds: {
+    '0': ObjectId("65cb3f56d48d38cbe39d71af"),
+    '1': ObjectId("65cb3f56d48d38cbe39d71b0"),
+    '2': ObjectId("65cb3f56d48d38cbe39d71b1")
+  }
+}
+--------------------------------------------------------------------------------------------
+//Case Sensitive->Collection name
+students> db.data.find().limit(2)
+[
+  { _id: ObjectId("65cb22f5706e57b02829bd98"), name: 'Aryan', age: 22 },
+  { _id: ObjectId("65cb23d1706e57b02829bd99"), name: 'Aryan', age: 22 }
+]
+------------------------------------
+students> db.Data.find().limit(2)
+
+students>
+------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Read Operation
+------------------------------------------------------------------------------------------------------------------------------------------------------
+students> db.data.find({'name':'Arshiyan'})
+[
+  {
+    _id: ObjectId("65cb3b51d48d38cbe39d71a4"),
+    name: 'Arshiyan',
+    age: 23
+  },
+  {
+    _id: ObjectId("65cb3cbcd48d38cbe39d71a7"),
+    name: 'Arshiyan',
+    age: 23
+  },
+  {
+    _id: ObjectId("65cb3ce4d48d38cbe39d71a9"),
+    name: 'Arshiyan',
+    age: 23
+  },
+  {
+    _id: ObjectId("65cb3f34d48d38cbe39d71ab"),
+    name: 'Arshiyan',
+    age: 23
+  },
+  {
+    _id: ObjectId("65cb3f56d48d38cbe39d71af"),
+    name: 'Arshiyan',
+    age: 23,
+    'course name': 'IT'
+  }
+]
+
+----------------------------------------------------------
+//Show only single document
+students> db.data.findOne({'name':'Arshiyan'})
+{
+  _id: ObjectId("65cb3b51d48d38cbe39d71a4"),
+  name: 'Arshiyan',
+  age: 23
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+//Comparison operators(Total showing document size is 20-21->it means iterator.
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+//1:Equal to operator($eq)
+
+shop> db.products.find({'price':{$eq:699}})
+//O/P:
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9262"),
+    name: 'Smartphone Model X',
+    company: '64c23350e32f4a51b19b9230',
+    price: 699,
+    colors: [ '#000000', '#ffffff', '#ff0000' ],
+    image: '/images/product-smartphone.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c236a2e32f4a51b19b9280"),
+    name: 'Elegant Dining Table',
+    company: '64c23350e32f4a51b19b9239',
+    price: 699,
+    colors: [ '#ffffff', '#ffcc00', '#cc9900' ],
+    image: '/images/product-dining-table.png',
+    category: '64c2342de32f4a51b19b925a',
+    isFeatured: true
+  },
+  {
+    _id: ObjectId("64c23707e32f4a51b19b9295"),
+    name: 'Elegant Dining Table',
+    company: '64c23350e32f4a51b19b9239',
+    price: 699,
+    colors: [ '#ffffff', '#ffcc00', '#cc9900' ],
+    image: '/images/product-dining-table.png',
+    category: '64c2342de32f4a51b19b925a',
+    isFeatured: true
+  },
+  {
+    _id: ObjectId("64c23825e32f4a51b19b92ba"),
+    name: 'Smartphone',
+    company: '64c23350e32f4a51b19b9236',
+    price: 699,
+    colors: [ '#333333', '#99cc00', '#ffcc00' ],
+    image: '/images/product-smartphone.png',
+    category: '64c2342de32f4a51b19b9251',
+    isFeatured: true
+  },
+  {
+    _id: ObjectId("64c23eb1f1b9c8985b80fd33"),
+    name: 'Tasty Concrete Mouse',
+    company: ObjectId("64c23350e32f4a51b19b9242"),
+    price: 699,
+    colors: [ '#2d0a6a' ],
+    image: '/images/product-Modern.png',
+    category: ObjectId("64c2342de32f4a51b19b9251"),
+    isFeatured: false,
+    __v: 0
+  },
+.........----------------------------------------------------
+shop> db.products.find({'price':{$eq:699}}).count()
+//O/P:
+13
+-------------------------------------------------------------------------------------
+//2.Not equal to($ne)
+shop> db.products.find({'price':{$ne:699}}).count()
+1
+.
+.
+.
+10342 data
+-------------------------
+shop> db.products.find({'price':{$ne:699}}).count()
+10342
+--------------------------------------------------------------------------------------
+//3.Greater than($gt)
+shop> db.products.find({'price':{$gt:699}}).count()
+3053 total data
+-----------------------------
+shop> db.products.find({'price':{$gt:699}}).count()
+3053
+-------------------------------------------------------------------------------------
+/4:Greater than equal to($gte)
+shop> db.products.find({'price':{$gte:699}}).count()
+3066
+------------------------------------------------------------------------------------
+//5.Lesser than($lt)
+shop> db.products.find({'price':{$lt:699}}).count()
+7289
+-------------------------------------------------------------------------------------
+//6.Lesser than equal to($lte)
+shop> db.products.find({'price':{$lte:699}}).count()
+7302
+------------------------------------------------------------------------------------
+//7.$in: Matches values that are within the specified array.
+db.products.find({'price': {$in: [129,39]}})
+//O/P:
+{
+    _id: ObjectId("64c23825e32f4a51b19b92b5"),
+    name: 'Wireless Earbuds',
+    company: '64c23350e32f4a51b19b9231',
+    price: 129,
+    colors: [ '#ffffff', '#ffcc00', '#cc9900' ],
+    image: '/images/product-wireless-earbuds.png',
+    category: '64c2342de32f4a51b19b9251',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c23825e32f4a51b19b92b9"),
+    name: 'Air Fryer',
+    company: '64c23350e32f4a51b19b9235',
+    price: 129,
+    colors: [ '#ffffff', '#ff99cc', '#00cc99' ],
+    image: '/images/product-air-fryer.png',
+    category: '64c2342de32f4a51b19b924f',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c23871e32f4a51b19b92c4"),
+    name: 'Portable Power Bank',
+    company: '64c23350e32f4a51b19b9241',
+    price: 39,
+    colors: [ '#ffffff', '#ff9900', '#0099ff' ],
+    image: '/images/product-power-bank.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: true
+  },
+  {
+    _id: ObjectId("64c23871e32f4a51b19b92c5"),
+    name: 'Cordless Drill Set',
+    company: '64c23350e32f4a51b19b9242',
+    price: 129,
+    colors: [ '#333333', '#ff9900', '#00cc99' ],
+    image: '/images/product-cordless-drill.png',
+    category: '64c2342de32f4a51b19b924f',
+    isFeatured: false
+  }
+---------------------------------------------------
+shop> db.products.find({'price':{$in:[129,39]}}).count()
+//O/P:
+53
+-----------------------------------------------------------------------------
+//8.$nin: Matches values that are not within the specified array.
+shop> db.products.find({'price':{$nin:[129,39]}}).count()
+10302
+--------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------------------------
+Cusrsor method
+---------------------------------------------------------------------------------------------------------------------------------------------------
+//1.Count
+shop> db.products.find({'price':{$nin:[129,39,69]}}).count()
+10291
+--------------------------------------------------------------------------
+//2.limit
+shop> db.products.find({'price':{$nin:[129,39,69]}}).limit(2)
+//O/P:
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9262"),
+    name: 'Smartphone Model X',
+    company: '64c23350e32f4a51b19b9230',
+    price: 699,
+    colors: [ '#000000', '#ffffff', '#ff0000' ],
+    image: '/images/product-smartphone.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9263"),
+    name: 'Laptop Pro',
+    company: '64c23350e32f4a51b19b9231',
+    price: 1299,
+    colors: [ '#333333', '#cccccc', '#00ff00' ],
+    image: '/images/product-laptop.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: true
+  }
+]
+-----------------------------------------------------------------------------
+//3.Skip
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9263"),
+    name: 'Laptop Pro',
+    company: '64c23350e32f4a51b19b9231',
+    price: 1299,
+    colors: [ '#333333', '#cccccc', '#00ff00' ],
+    image: '/images/product-laptop.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: true
+  },
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9264"),
+    name: 'Smart Watch',
+    company: '64c23350e32f4a51b19b9232',
+    price: 249,
+    colors: [ '#000000', '#ff0000', '#00ff00' ],
+    image: '/images/product-smartwatch.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: false
+  }
+]
+-------------------------------------------------------------------------------
+//4.sort
+shop> db.products.find({'price':{$gt:1250}}).limit(5).sort({'price':1})
+//O/P:
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9263"),
+    name: 'Laptop Pro',
+    company: '64c23350e32f4a51b19b9231',
+    price: 1299,
+    colors: [ '#333333', '#cccccc', '#00ff00' ],
+    image: '/images/product-laptop.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: true
+  },
+  {
+    _id: ObjectId("64c236a2e32f4a51b19b9281"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c23707e32f4a51b19b9296"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  }
+]
+-------------------------------------------------------------------
+//Descending
+shop> db.products.find({'price':{$gt:1250}}).limit(3).sort({'price':-1})
+//O/P:
+[
+  {
+    _id: ObjectId("64c23707e32f4a51b19b9296"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c236a2e32f4a51b19b9281"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9263"),
+    name: 'Laptop Pro',
+    company: '64c23350e32f4a51b19b9231',
+    price: 1299,
+    colors: [ '#333333', '#cccccc', '#00ff00' ],
+    image: '/images/product-laptop.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: true
+  }
+]
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------
+Logical operator
+--------------------------------------------------------------------------------------------------------------------------------------------------
+//1.And($and) by default and operator
+//Q.! Find products with price greater than 100 and name equal to "Diamond Ring"
+shop> db.products.find({$and:[{'price':{$gt:10}},{'name':'Diamond Ring'}]})
+[
+  {
+    _id: ObjectId("64c236a2e32f4a51b19b9281"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c23707e32f4a51b19b9296"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  }
+]
+------------------------------------------------------------------------
+//2.Or($or)
+//O/P:
+shop> db.products.find({$or:[{'price':{$gt:2000}},{'name':'Diamond Ring'}]})
+[
+  {
+    _id: ObjectId("64c236a2e32f4a51b19b9281"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c23707e32f4a51b19b9296"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  }
+]
+------------------------------------------------------------------------------
+3.Nor($nor)->Ye price or name ko chod ke jo bhi h dikha do
+shop> db.products.find({$nor:[{'price':{$gt:2000}},{'name':'Diamond Ring'}]}).count()
+10353
+----------------------------------------------------------------------------------
+4.Not($not)
+shop> db.products.find({'price':{$eq:100}}).count()
+7
+shop> db.products.find({'price':{$not:{$eq:100}}}).count()
+10348
+shop> db.products.find({'price':{$ne:100}}).count()
+10348
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Complex Expression
+------------------------------------------------------------------------------------------------------------------------------------------------------
+shop> db.products.find({'price':{$gt:1340}})
+[
+  {
+    _id: ObjectId("64c236a2e32f4a51b19b9281"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c23707e32f4a51b19b9296"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  }
+]
+---------------------------------------------------------------------------------
+->Remember ->['$price',1340]}})->comma
+shop> db.products.find({$expr:{$gt:['$price',1340]}})
+[
+  {
+    _id: ObjectId("64c236a2e32f4a51b19b9281"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c23707e32f4a51b19b9296"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  }
+]
+-------------------------------------------------------------------------------------
+//Expression://Q. Find sales where (quantity * price) is greater than targetPrice
+shop> db.sales.find({$expr:{$lt:[{$add:['$quantity','$price']},'$targetPrice']}})
+[
+  { _id: 2, quantity: 5, price: 25, targetPrice: 100 },
+  { _id: 1, quantity: 10, price: 15, targetPrice: 120 },
+  { _id: 3, quantity: 6, price: 35, targetPrice: 100 },
+  { _id: 4, quantity: 5, price: 55, targetPrice: 150 },
+  { _id: 5, quantity: 5, price: 55, targetPrice: 150 }
+]
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Elements operator
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+//1: $exists: Matches documents that have a specific field, regardless of its value.
+
+shop> db.products.find({price:{$exists:true}}).count()
+//O/P:
+10355
+------------------------------------------------------------
+shop> db.products.find({price:{$exists:false}}).count()
+//O/P:
+0
+------------------------------------------------------------
+shop> db.products.find({price:{$exists:false},price:{$gt:1250}}).count()
+//O/P:
+3
+----------------------------------------------------------------------------
+shop> db.products.find({price:{$exists:false},price:{$gt:1250}})
+//O/P:
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9263"),
+    name: 'Laptop Pro',
+    company: '64c23350e32f4a51b19b9231',
+    price: 1299,
+    colors: [ '#333333', '#cccccc', '#00ff00' ],
+    image: '/images/product-laptop.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: true
+  },
+  {
+    _id: ObjectId("64c236a2e32f4a51b19b9281"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c23707e32f4a51b19b9296"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  }
+]
+--------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+//2.$Type operator(Check BSON Datatype)
+----------------------------------------------------------------------------------------------------
+shop> db.products.find({price:{$type:'number'}}).count()
+10355
+------------------------------------------------------------
+shop> db.products.find({price:{$type:'string'}}).count()
+0
+------------------------------------------------------------
+shop> db.products.find({isFeatured::{$type:'bool'}}).count()
+10355
+------------------------------------------------------------
+shop> db.products.find({isFeatured:{$type:8}}).count()
+10355
+------------------------------------------------------------
+shop> db.products.find({name:{$type:2}}).count()
+10355
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+//3: $size: The $size operator matches documents where the size of an array field matches a specified value.
+shop> db.comments.find({'comments':{$size:4}})
+//O/P:
+[
+  {
+    _id: 1,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'John Doe',
+    comments: [
+      { user: 'Alice', text: 'Great article!' },
+      { user: 'Bob', text: 'Thanks for sharing.' },
+      { user: 'Eva', text: 'Its beatifull!' },
+      { user: 'jessy' }
+    ],
+    metadata: { views: 1000, likes: 50 }
+  }
+]
+---------------------------------------------------------------------
+shop> db.comments.find({'comments':{$size:2}}).count()
+6
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+Projection->1 means show->0 means hide
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+shop> db.comments.find({'comments':{$size:2}},{comments:1})
+//O/P:
+[
+  {
+    _id: 2,
+    comments: [
+      { user: 'Charlie', text: 'Very informative!' },
+      { user: 'David', text: 'Well explained.' }
+    ]
+  },
+  {
+    _id: 3,
+    comments: [
+      { user: 'Eva', text: 'Very helpful!' },
+      { user: 'Frank', text: 'Clear explanations.' }
+    ]
+  },
+  {
+    _id: 4,
+    comments: [
+      { user: 'Grace', text: 'Mind-blowing content!' },
+      { user: 'Henry', text: 'Impressive examples.' }
+    ]
+  },
+  {
+    _id: 5,
+    comments: [
+      { user: 'Ivy', text: 'Very practical advice!' },
+      { user: 'Jack', text: 'Helped me a lot.' }
+    ]
+  },
+  {
+    _id: 6,
+    comments: [
+      { user: 'Kevin', text: 'Invaluable insights!' },
+      { user: 'Lily', text: 'Well-structured explanations.' }
+    ]
+  },
+  {
+    _id: 7,
+    comments: [
+      { user: 'Alice', text: 'Awesome article!' },
+      { user: 'Vinod', text: 'Thanks for sharing.' }
+    ]
+  }
+]
+-------------------------------------------------------------------
+shop> db.comments.find({'comments':{$size:2}},{comments:1,_id:0})
+//O/P:
+[
+  {
+    comments: [
+      { user: 'Charlie', text: 'Very informative!' },
+      { user: 'David', text: 'Well explained.' }
+    ]
+  },
+  {
+    comments: [
+      { user: 'Eva', text: 'Very helpful!' },
+      { user: 'Frank', text: 'Clear explanations.' }
+    ]
+  },
+  {
+    comments: [
+      { user: 'Grace', text: 'Mind-blowing content!' },
+      { user: 'Henry', text: 'Impressive examples.' }
+    ]
+  },
+  {
+    comments: [
+      { user: 'Ivy', text: 'Very practical advice!' },
+      { user: 'Jack', text: 'Helped me a lot.' }
+    ]
+  },
+  {
+    comments: [
+      { user: 'Kevin', text: 'Invaluable insights!' },
+      { user: 'Lily', text: 'Well-structured explanations.' }
+    ]
+  },
+  {
+    comments: [
+      { user: 'Alice', text: 'Awesome article!' },
+      { user: 'Vinod', text: 'Thanks for sharing.' }
+    ]
+  }
+]
+--------------------------------------------------------------------------------------------------------------
+shop> db.comments.find({'comments':{$size:2}},{comments:1,author:0,_id:0})
+MongoServerError: Cannot do exclusion on field author in inclusion projection
+--------------------------------------------------------------------------------------------------------------
+shop> db.comments.find({'comments':{$size:2}},{comments:0,author:0,_id:1})
+[
+  {
+    _id: 2,
+    title: 'Deep Dive into Aggregation Framework',
+    content: 'The aggregation framework in MongoDB...',
+    metadata: { views: 800, likes: 70 }
+  },
+  {
+    _id: 3,
+    title: 'Getting Started with NoSQL Databases',
+    content: 'NoSQL databases provide flexible data models...',
+    metadata: { views: 1200, likes: 40 }
+  },
+  {
+    _id: 4,
+    title: 'Advanced Queries in MongoDB',
+    content: 'Learn how to write complex queries...',
+    metadata: { views: 1500, likes: 60 }
+  },
+  {
+    _id: 5,
+    title: 'Optimizing MongoDB Performance',
+    content: 'Tips and tricks to improve MongoDB performance...',
+    metadata: { views: 900, likes: 55 }
+  },
+  {
+    _id: 6,
+    title: 'Schema Design Best Practices',
+    content: 'Designing schemas for optimal performance...',
+    metadata: { views: 700, likes: 65 }
+  },
+  {
+    _id: 7,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    metadata: { views: 1000, likes: 70 }
+  }
+]
+----------------------------------------------------------------------------------
+shop> db.comments.find({'comments':{$size:2}},{title:1,author:1,_id:1})
+[
+  {
+    _id: 2,
+    title: 'Deep Dive into Aggregation Framework',
+    author: 'Jane Smith'
+  },
+  {
+    _id: 3,
+    title: 'Getting Started with NoSQL Databases',
+    author: 'Sarah Williams'
+  },
+  {
+    _id: 4,
+    title: 'Advanced Queries in MongoDB',
+    author: 'Michael Johnson'
+  },
+  {
+    _id: 5,
+    title: 'Optimizing MongoDB Performance',
+    author: 'Alex Turner'
+  },
+  {
+    _id: 6,
+    title: 'Schema Design Best Practices',
+    author: 'Emily Brown'
+  },
+  { _id: 7, title: 'Introduction to MongoDB', author: 'Vinod Thapa' }
+]
+-----------------------------------------------------------------------------
+shop> db.comments.find({'comments':{$size:2}},{title:1,author:1,_id:0})
+[
+  {
+    title: 'Deep Dive into Aggregation Framework',
+    author: 'Jane Smith'
+  },
+  {
+    title: 'Getting Started with NoSQL Databases',
+    author: 'Sarah Williams'
+  },
+  { title: 'Advanced Queries in MongoDB', author: 'Michael Johnson' },
+  { title: 'Optimizing MongoDB Performance', author: 'Alex Turner' },
+  { title: 'Schema Design Best Practices', author: 'Emily Brown' },
+  { title: 'Introduction to MongoDB', author: 'Vinod Thapa' }
+]
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+Embedded Documents (Dealing with Arrays & Object)->use dot(Note)
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+//Q.1:Find posts with comments by a specific user (Array)
+shop> db.comments.find({'comments.user':'Lily'})
+//O/P:
+[
+  {
+    _id: 6,
+    title: 'Schema Design Best Practices',
+    content: 'Designing schemas for optimal performance...',
+    author: 'Emily Brown',
+    comments: [
+      { user: 'Kevin', text: 'Invaluable insights!' },
+      { user: 'Lily', text: 'Well-structured explanations.' }
+    ],
+    metadata: { views: 700, likes: 65 }
+  }
+]
+----------------------------------------------------------------------------
+//Q.2.Find the documents where the views in metadata field > 1200. (Object)
+shop> db.comments.find({'metadata.views':{$gt:1200}})
+[
+  {
+    _id: 4,
+    title: 'Advanced Queries in MongoDB',
+    content: 'Learn how to write complex queries...',
+    author: 'Michael Johnson',
+    comments: [
+      { user: 'Grace', text: 'Mind-blowing content!' },
+      { user: 'Henry', text: 'Impressive examples.' }
+    ],
+    metadata: { views: 1500, likes: 60 }
+  }
+]
+------------------------------------------------------------------------------
+//Q.3: we need to find out the document where the user in comments = Henry and also the in the metadata likes value > 50.
+shop> db.comments.find({'comments.user':'Henry','metadata.likes':{$gt:50}})
+[
+  {
+    _id: 4,
+    title: 'Advanced Queries in MongoDB',
+    content: 'Learn how to write complex queries...',
+    author: 'Michael Johnson',
+    comments: [
+      { user: 'Grace', text: 'Mind-blowing content!' },
+      { user: 'Henry', text: 'Impressive examples.' }
+    ],
+    metadata: { views: 1500, likes: 60 }
+  }
+]
+-----------------------------------------------------------------------------------
+//Q.4:we need to return an comments array which must have this two (user = alice & vinod) elements only in it.
+//! We need to use $all operator. Here the order doesn’t’ matter.
+shop> db.comments.find({'comments.user':{$all:['Alice','Vinod']}})
+[
+  {
+    _id: 7,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'Vinod Thapa',
+    comments: [
+      { user: 'Alice', text: 'Awesome article!' },
+      { user: 'Vinod', text: 'Thanks for sharing.' }
+    ],
+    metadata: { views: 1000, likes: 70 }
+  }
+]
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+shop> db.comments.find({'comments.user':{$all:['Alice','Vinod','Bob']}})
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+//Q.5:  In Array for multiple querying we user $elemMatch operator.
+//* Here is the syntax: {field: {$elemMatch: { {query1},{query2}..  }}}
+shop> db.comments.find({'comments':{$elemMatch:{'user':'Alice','text':'Awesome article!'}}})
+[
+  {
+    _id: 7,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'Vinod Thapa',
+    comments: [
+      { user: 'Alice', text: 'Awesome article!' },
+      { user: 'Vinod', text: 'Thanks for sharing.' }
+    ],
+    metadata: { views: 1000, likes: 70 }
+  }
+]
+
+//Another Simple way
+shop> db.comments.find({'comments.user':'Alice','comments.text':'Awesome article!'})
+[
+  {
+    _id: 7,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'Vinod Thapa',
+    comments: [
+      { user: 'Alice', text: 'Awesome article!' },
+      { user: 'Vinod', text: 'Thanks for sharing.' }
+    ],
+    metadata: { views: 1000, likes: 70 }
+  }
+]
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Update operation
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+shop> db.products.find({_id:ObjectId("64c2363be32f4a51b19b9275")})
+[
+  {
+    _id: ObjectId("64c2363be32f4a51b19b9275"),
+    name: 'Air Fryer',
+    company: '64c23350e32f4a51b19b9242',
+    price: 129,
+    colors: [ '#000000', '#666666', '#cc9900' ],
+    image: '/images/product-air-fryer.png',
+    category: '64c2342de32f4a51b19b925b',
+    isFeatured: false
+  }
+]
+-------------------------------------------------------------------------
+//Update above id price field
+shop> db.products.updateOne({_id:ObjectId("64c2363be32f4a51b19b9275")},{$set:{'price':45}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+//updated price field
+shop> db.products.find({_id:ObjectId("64c2363be32f4a51b19b9275")})
+[
+  {
+    _id: ObjectId("64c2363be32f4a51b19b9275"),
+    name: 'Air Fryer',
+    company: '64c23350e32f4a51b19b9242',
+    price: 45,
+    colors: [ '#000000', '#666666', '#cc9900' ],
+    image: '/images/product-air-fryer.png',
+    category: '64c2342de32f4a51b19b925b',
+    isFeatured: false
+  }
+]
+--------------------------------------------------------------------------
+/Q.Update the isFeatures value = true in a products collections, where the name = Designer Handbag
+//Before update
+shop> db.products.find({name:'Designer Handbag'})
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b926c"),
+    name: 'Designer Handbag',
+    company: '64c23350e32f4a51b19b923a',
+    price: 349,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-handbag.png',
+    category: '64c2342de32f4a51b19b9250',
+    isFeatured: true
+  }
+]
+
+//update success
+shop> db.products.updateOne({name:'Designer Handbag'},{$set:{isFeatured:false}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+//after update
+shop> db.products.find({name:'Designer Handbag'})
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b926c"),
+    name: 'Designer Handbag',
+    company: '64c23350e32f4a51b19b923a',
+    price: 349,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-handbag.png',
+    category: '64c2342de32f4a51b19b9250',
+    isFeatured: false
+  }
+]
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+Update many
+----------------------------------------------------------------------------------------------------
+shop> db.products.find({price:120}).count()
+5
+
+shop> db.products.updateMany({price:120},{$set:{isFeatured:true}})
+//Update Success
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 5,
+  modifiedCount: 5,
+  upsertedCount: 0
+}
+shop> db.products.find({price:120})
+//After update jaha bhi price 120 h waha per isFeatured ko true krdo
+[
+  {
+    _id: ObjectId("64c23edf9dc1fb2f85602168"),
+    name: 'Ergonomic Granite Sausages',
+    company: ObjectId("64c23350e32f4a51b19b9240"),
+    price: 120,
+    colors: [ '#641e3b' ],
+    image: '/images/product-Luxurious.png',
+    category: ObjectId("64c2342de32f4a51b19b925f"),
+    isFeatured: true,
+    __v: 0
+  },
+  {
+    _id: ObjectId("64c23edf9dc1fb2f85602c38"),
+    name: 'Unbranded Frozen Chicken',
+    company: ObjectId("64c23350e32f4a51b19b9234"),
+    price: 120,
+    colors: [ '#146d77' ],
+    image: '/images/product-Tasty.png',
+    category: ObjectId("64c2342de32f4a51b19b9261"),
+    isFeatured: true,
+    __v: 0
+  },
+  {
+    _id: ObjectId("64c23f13f8ffc4957dc4f16e"),
+    name: 'Electronic Concrete Bacon',
+    company: ObjectId("64c23350e32f4a51b19b923f"),
+    price: 120,
+    colors: [ '#383d3d' ],
+    image: '/images/product-Fantastic.png',
+    category: ObjectId("64c2342de32f4a51b19b9258"),
+    isFeatured: true,
+    __v: 0
+  },
+  {
+    _id: ObjectId("64c23f13f8ffc4957dc4fe9e"),
+    name: 'Practical Concrete Ball',
+    company: ObjectId("64c23350e32f4a51b19b9230"),
+    price: 120,
+    colors: [ '#34221e' ],
+    image: '/images/product-Sleek.png',
+    category: ObjectId("64c2342de32f4a51b19b9250"),
+    isFeatured: true,
+    __v: 0
+  },
+  {
+    _id: ObjectId("64c23f13f8ffc4957dc4ff92"),
+    name: 'Incredible Plastic Sausages',
+    company: ObjectId("64c23350e32f4a51b19b9242"),
+    price: 120,
+    colors: [ '#332648' ],
+    image: '/images/product-Ergonomic.png',
+    category: ObjectId("64c2342de32f4a51b19b9256"),
+    isFeatured: true,
+    __v: 0
+  }
+]
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+Removing and Renaming fields
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+//Renaming field($rename)->{'isFeatured':'isFeature'}->:(note)
+shop> db.products.updateMany({price:120},{$rename:{'isFeatured':'isFeature'}})
+//Rename sucess
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 5,
+  modifiedCount: 5,
+  upsertedCount: 0
+}
+shop> db.products.find({price:120})
+//After field name rename
+[
+  {
+    _id: ObjectId("64c23edf9dc1fb2f85602168"),
+    name: 'Ergonomic Granite Sausages',
+    company: ObjectId("64c23350e32f4a51b19b9240"),
+    price: 120,
+    colors: [ '#641e3b' ],
+    image: '/images/product-Luxurious.png',
+    category: ObjectId("64c2342de32f4a51b19b925f"),
+    __v: 0,
+    isFeature: true
+  },
+  {
+    _id: ObjectId("64c23edf9dc1fb2f85602c38"),
+    name: 'Unbranded Frozen Chicken',
+    company: ObjectId("64c23350e32f4a51b19b9234"),
+    price: 120,
+    colors: [ '#146d77' ],
+    image: '/images/product-Tasty.png',
+    category: ObjectId("64c2342de32f4a51b19b9261"),
+    __v: 0,
+    isFeature: true
+  },
+  {
+    _id: ObjectId("64c23f13f8ffc4957dc4f16e"),
+    name: 'Electronic Concrete Bacon',
+    company: ObjectId("64c23350e32f4a51b19b923f"),
+    price: 120,
+    colors: [ '#383d3d' ],
+    image: '/images/product-Fantastic.png',
+    category: ObjectId("64c2342de32f4a51b19b9258"),
+    __v: 0,
+    isFeature: true
+  },
+  {
+    _id: ObjectId("64c23f13f8ffc4957dc4fe9e"),
+    name: 'Practical Concrete Ball',
+    company: ObjectId("64c23350e32f4a51b19b9230"),
+    price: 120,
+    colors: [ '#34221e' ],
+    image: '/images/product-Sleek.png',
+    category: ObjectId("64c2342de32f4a51b19b9250"),
+    __v: 0,
+    isFeature: true
+  },
+  {
+    _id: ObjectId("64c23f13f8ffc4957dc4ff92"),
+    name: 'Incredible Plastic Sausages',
+    company: ObjectId("64c23350e32f4a51b19b9242"),
+    price: 120,
+    colors: [ '#332648' ],
+    image: '/images/product-Ergonomic.png',
+    category: ObjectId("64c2342de32f4a51b19b9256"),
+    __v: 0,
+    isFeature: true
+  }
+]
+
+-------------------------------------------------------------------------
+//Delete field($unset)
+shop> db.products.updateMany({price:120},{$unset:{isFeature:true}})
+//Field deleted sucess
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 5,
+  modifiedCount: 5,
+  upsertedCount: 0
+}
+shop> db.products.find({price:120})
+//After deleting isFeature field
+[
+  {
+    _id: ObjectId("64c23edf9dc1fb2f85602168"),
+    name: 'Ergonomic Granite Sausages',
+    company: ObjectId("64c23350e32f4a51b19b9240"),
+    price: 120,
+    colors: [ '#641e3b' ],
+    image: '/images/product-Luxurious.png',
+    category: ObjectId("64c2342de32f4a51b19b925f"),
+    __v: 0
+  },
+  {
+    _id: ObjectId("64c23edf9dc1fb2f85602c38"),
+    name: 'Unbranded Frozen Chicken',
+    company: ObjectId("64c23350e32f4a51b19b9234"),
+    price: 120,
+    colors: [ '#146d77' ],
+    image: '/images/product-Tasty.png',
+    category: ObjectId("64c2342de32f4a51b19b9261"),
+    __v: 0
+  },
+---------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------
+$set:new field add
+------------------------------------------------------------------------------------------------------------
+shop> db.comments.find().limit(1)
+//before added new user field
+[
+  {
+    _id: 1,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'John Doe',
+    comments: [
+      { user: 'Alice', text: 'Great article!' },
+      { user: 'Bob', text: 'Thanks for sharing.' },
+      { user: 'Eva', text: 'Its beatifull!' },
+      { user: 'jessy' }
+    ],
+    metadata: { views: 1000, likes: 50 }
+  }
+]
+shop> db.comments.updateOne({_id:1},{$set:{'user':'Aryan'}})
+//field added sucess
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+shop> db.comments.find().limit(1)
+//User field added
+[
+  {
+    _id: 1,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'John Doe',
+    comments: [
+      { user: 'Alice', text: 'Great article!' },
+      { user: 'Bob', text: 'Thanks for sharing.' },
+      { user: 'Eva', text: 'Its beatifull!' },
+      { user: 'jessy' }
+    ],
+    metadata: { views: 1000, likes: 50 },
+    user: 'Aryan'
+  }
+]
+----------------------------------------------------------------------------------------------
+//$unset:Delete Last field.
+shop> db.comments.updateOne({_id:1},{$unset:{'user':'Aryan'}})
+//user field deleted sucess
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+shop> db.comments.find().limit(1)
+//After deleting user field
+[
+  {
+    _id: 1,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'John Doe',
+    comments: [
+      { user: 'Alice', text: 'Great article!' },
+      { user: 'Bob', text: 'Thanks for sharing.' },
+      { user: 'Eva', text: 'Its beatifull!' },
+      { user: 'jessy' }
+    ],
+    metadata: { views: 1000, likes: 50 }
+  }
+]
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+updating array and Embedded Documents
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+//1.$push:
+//add new feild in comments success
+shop> db.comments.updateOne({_id:1},{$push:{comments:{user:'Aryan',text:'All the best'}}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+shop> db.comments.find().limit(1)
+//after add new feild in comments
+[
+  {
+    _id: 1,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'John Doe',
+    comments: [
+      { user: 'Alice', text: 'Great article!' },
+      { user: 'Bob', text: 'Thanks for sharing.' },
+      { user: 'Eva', text: 'Its beatifull!' },
+      { user: 'jessy' },
+      { user: 'Aryan', text: 'All the best' }
+    ],
+    metadata: { views: 1000, likes: 50 }
+  }
+]
+--------------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------------
+//2.$pop:
+//Before deletion last field of comment
+shop> db.comments.find().limit(1)
+[
+  {
+    _id: 1,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'John Doe',
+    comments: [
+      { user: 'Alice', text: 'Great article!' },
+      { user: 'Bob', text: 'Thanks for sharing.' },
+      { user: 'Eva', text: 'Its beatifull!' },
+      { user: 'jessy' },
+      { user: 'Aryan', text: 'All the best' },
+      { user: 'Aryan' }
+    ],
+    metadata: { views: 1000, likes: 50 }
+  }
+]
+
+
+shop> db.comments.updateOne({_id:1},{$pop:{'comments':1}})
+//deletion last field of comment success
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+shop> db.comments.find().limit(1)
+//after deletion last field of comment
+[
+  {
+    _id: 1,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'John Doe',
+    comments: [
+      { user: 'Alice', text: 'Great article!' },
+      { user: 'Bob', text: 'Thanks for sharing.' },
+      { user: 'Eva', text: 'Its beatifull!' },
+      { user: 'jessy' },
+      { user: 'Aryan', text: 'All the best' }
+    ],
+    metadata: { views: 1000, likes: 50 }
+  }
+]
+-------------------------------------------------------------------------------------------
+//3.$type.:
+//before Update text from specific user comments->user:Aryan->text
+shop> db.comments.find({_id:1,'comments.user':'Alice'})
+[
+  {
+    _id: 1,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'John Doe',
+    comments: [
+      { user: 'Alice', text: 'Great article!' },
+      { user: 'Bob', text: 'Thanks for sharing.' },
+      { user: 'Eva', text: 'Its beatifull!' },
+      { user: 'jessy' },
+      { user: 'Aryan', text: 'All the best' }
+    ],
+    metadata: { views: 1000, likes: 50 }
+  }
+]
+
+
+shop> db.comments.updateOne({_id:1,'comments.user':'Alice'},{$set:{'comments.$.text':'Awesome'}})
+//Update text from specific user comments success
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+shop> db.comments.find({_id:1,'comments.user':'Alice'})
+//After Update text from specific user comments
+[
+  {
+    _id: 1,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'John Doe',
+    comments: [
+      { user: 'Alice', text: 'Awesome' },
+      { user: 'Bob', text: 'Thanks for sharing.' },
+      { user: 'Eva', text: 'Its beatifull!' },
+      { user: 'jessy' },
+      { user: 'Aryan', text: 'All the best' }
+    ],
+    metadata: { views: 1000, likes: 50 }
+  }
+]
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Delete Collection
+------------------------------------------------------------------------------------------------------------------------------------------------------
+//1.deleteOne:
+//Before deletion
+[
+  {
+    _id: 1,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'John Doe',
+    comments: [
+      { user: 'Alice', text: 'Awesome' },
+      { user: 'Bob', text: 'Thanks for sharing.' },
+      { user: 'Eva', text: 'Its beatifull!' },
+      { user: 'jessy' },
+      { user: 'Aryan', text: 'All the best' }
+    ],
+    metadata: { views: 1000, likes: 50 }
+  }
+]
+
+//Delete Collection id 1 success
+shop> db.comments.deleteOne({_id:1})
+
+{ acknowledged: true, deletedCount: 1 }
+shop>
+
+shop> db.comments.find().limit(3)
+//After deletion collection
+[
+  {
+    _id: 2,
+    title: 'Deep Dive into Aggregation Framework',
+    content: 'The aggregation framework in MongoDB...',
+    author: 'Jane Smith',
+    comments: [
+      { user: 'Charlie', text: 'Very informative!' },
+      { user: 'David', text: 'Well explained.' }
+    ],
+    metadata: { views: 800, likes: 70 }
+  },
+  {
+    _id: 3,
+    title: 'Getting Started with NoSQL Databases',
+    content: 'NoSQL databases provide flexible data models...',
+    author: 'Sarah Williams',
+    comments: [
+      { user: 'Eva', text: 'Very helpful!' },
+      { user: 'Frank', text: 'Clear explanations.' }
+    ],
+    metadata: { views: 1200, likes: 40 }
+  },
+  {
+    _id: 4,
+    title: 'Advanced Queries in MongoDB',
+    content: 'Learn how to write complex queries...',
+    author: 'Michael Johnson',
+    comments: [
+      { user: 'Grace', text: 'Mind-blowing content!' },
+      { user: 'Henry', text: 'Impressive examples.' }
+    ],
+    metadata: { views: 1500, likes: 60 }
+  }
+]
+
+----------------------------------------------------------------------------------------------------
+//2.Delete Many
+shop> db.products.deleteMany({price:55})
+{ acknowledged: true, deletedCount: 6 }
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+//BASIC  END.....

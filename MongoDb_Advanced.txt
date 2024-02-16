@@ -1,0 +1,596 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+Indexes
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+//Explain:
+shop> db.products.find({price:{$gt:100}}).explain()
+{
+  explainVersion: '1',
+  queryPlanner: {
+    namespace: 'shop.products',
+    indexFilterSet: false,
+    parsedQuery: { price: { '$gt': 100 } },
+    queryHash: 'A6287036',
+    planCacheKey: 'A6287036',
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    winningPlan: {
+      stage: 'COLLSCAN',
+      filter: { price: { '$gt': 100 } },
+      direction: 'forward'
+    },
+    rejectedPlans: []
+  },
+  command: {
+    find: 'products',
+    filter: { price: { '$gt': 100 } },
+    '$db': 'shop'
+  },
+  serverInfo: {
+    host: 'DESKTOP-4VM50K1',
+    port: 27017,
+    version: '7.0.5',
+    gitVersion: '7809d71e84e314b497f282ea8aa06d7ded3eb205'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted'
+  },
+  ok: 1
+}
+---------------------------------------------------------------------------------------------------------
+//executionStats:->Show execution statatics
+shop> db.products.find({price:{$gt:100}}).explain('executionStats')
+{
+  explainVersion: '1',
+  queryPlanner: {
+    namespace: 'shop.products',
+    indexFilterSet: false,
+    parsedQuery: { price: { '$gt': 100 } },
+    queryHash: 'A6287036',
+    planCacheKey: 'A6287036',
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    winningPlan: {
+      stage: 'COLLSCAN',
+      filter: { price: { '$gt': 100 } },
+      direction: 'forward'
+    },
+    rejectedPlans: []
+  },
+  executionStats: {
+    executionSuccess: true,
+    nReturned: 9215,
+    executionTimeMillis: 21,
+    totalKeysExamined: 0,
+    totalDocsExamined: 10349,
+    executionStages: {
+      stage: 'COLLSCAN',
+      filter: { price: { '$gt': 100 } },
+      nReturned: 9215,
+      executionTimeMillisEstimate: 0,
+      works: 10350,
+      advanced: 9215,
+      needTime: 1134,
+      needYield: 0,
+      saveState: 10,
+      restoreState: 10,
+      isEOF: 1,
+      direction: 'forward',
+      docsExamined: 10349
+    }
+  },
+  command: {
+    find: 'products',
+    filter: { price: { '$gt': 100 } },
+    '$db': 'shop'
+  },
+  serverInfo: {
+    host: 'DESKTOP-4VM50K1',
+    port: 27017,
+    version: '7.0.5',
+    gitVersion: '7809d71e84e314b497f282ea8aa06d7ded3eb205'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted'
+  },
+  ok: 1
+}
+------------------------------------------------------------------------------------------------------------------
+shop> db.products.explain('executionStats').find({'name':'Air Fryer'})
+{
+  explainVersion: '1',
+  queryPlanner: {
+    namespace: 'shop.products',
+    indexFilterSet: false,
+    parsedQuery: { name: { '$eq': 'Air Fryer' } },
+    queryHash: 'A2F868FD',
+    planCacheKey: 'A2F868FD',
+    maxIndexedOrSolutionsReached: false,
+    maxIndexedAndSolutionsReached: false,
+    maxScansToExplodeReached: false,
+    winningPlan: {
+      stage: 'COLLSCAN',
+      filter: { name: { '$eq': 'Air Fryer' } },
+      direction: 'forward'
+    },
+    rejectedPlans: []
+  },
+  executionStats: {
+    executionSuccess: true,
+    nReturned: 3,
+    executionTimeMillis: 19,
+    totalKeysExamined: 0,
+    totalDocsExamined: 10349,
+    executionStages: {
+      stage: 'COLLSCAN',
+      filter: { name: { '$eq': 'Air Fryer' } },
+      nReturned: 3,
+      executionTimeMillisEstimate: 1,
+      works: 10350,
+      advanced: 3,
+      needTime: 10346,
+      needYield: 0,
+      saveState: 10,
+      restoreState: 10,
+      isEOF: 1,
+      direction: 'forward',
+      docsExamined: 10349
+    }
+  },
+  command: { find: 'products', filter: { name: 'Air Fryer' }, '$db': 'shop' },
+  serverInfo: {
+    host: 'DESKTOP-4VM50K1',
+    port: 27017,
+    version: '7.0.5',
+    gitVersion: '7809d71e84e314b497f282ea8aa06d7ded3eb205'
+  },
+  serverParameters: {
+    internalQueryFacetBufferSizeBytes: 104857600,
+    internalQueryFacetMaxOutputDocSizeBytes: 104857600,
+    internalLookupStageIntermediateDocumentMaxSizeBytes: 104857600,
+    internalDocumentSourceGroupMaxMemoryBytes: 104857600,
+    internalQueryMaxBlockingSortMemoryUsageBytes: 104857600,
+    internalQueryProhibitBlockingMergeOnMongoS: 0,
+    internalQueryMaxAddToSetBytes: 104857600,
+    internalDocumentSourceSetWindowFieldsMaxMemoryBytes: 104857600,
+    internalQueryFrameworkControl: 'trySbeRestricted'
+  },
+  ok: 1
+}
+---------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------
+create Index
+--------------------------------------------------------------------------------------------------------------
+shop> db.products.getIndexes()
+[ { v: 2, key: { _id: 1 }, name: '_id_' } ]
+----------------------------------------------------------------------------
+shop> db.products.createIndex({'name':1})
+name_1
+shop> db.products.getIndexes()
+[
+  { v: 2, key: { _id: 1 }, name: '_id_' },
+  { v: 2, key: { name: 1 }, name: 'name_1' }
+]
+----------------------------------------------------------------------------
+shop> db.products.explain('executionStats').find({'name':'Air Fryer'}) 
+executionStages: {
+      stage: 'FETCH',
+      nReturned: 3,
+      executionTimeMillisEstimate: 0,
+      works: 4,
+      advanced: 3,
+      needTime: 0,
+      needYield: 0,
+      saveState: 0,
+      restoreState: 0,
+      isEOF: 1,
+      docsExamined: 3,
+      alreadyHasObj: 0,
+      inputStage: {
+        stage: 'IXSCAN',
+        nReturned: 3,
+        executionTimeMillisEstimate: 0,
+        works: 4,
+        advanced: 3,
+        needTime: 0,
+        needYield: 0,
+        saveState: 0,
+        restoreState: 0,
+        isEOF: 1,
+        keyPattern: { name: 1 },
+        indexName: 'name_1',
+        isMultiKey: false,
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+shop> db.products.dropIndex({name:1})
+{ nIndexesWas: 2, ok: 1 }
+shop> db.products.getIndexes()
+[ { v: 2, key: { _id: 1 }, name: '_id_' } ]
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+//* Creating a unique index
+// db.users.createIndex({ email: 1 }, { unique: true });
+----------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------
+//* When not to use indexes?
+-----------------------------------------------------------------------------------------------------------------------------------------------
+// Indexes can actually slow things down in some conditions, it usually slows things down if your query is going to return huge amounts of data.  It’s unnecessary to use indexes everywhere.
+
+// For example
+ db.products.explain('executionStats').find({price: {$gt: 100}});
+// The think it is returning almost 90% of data in output
+// nReturned: 9216,
+
+// let create the index for the Price
+db.products.createIndex({price:1})
+
+// Now lets check the time its taking
+// executionTimeMillis: 26, it is taking almost double time
+-------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
+Aggregation(aggregate)
+-------------------------------------------------------------------------------------------------------------------------------------------------
+//1.$match: The $match stage filters documents based on specified conditions.
+
+shop> db.products.aggregate([{$match:{'name':'Sleek Wooden Tuna'}}])
+[
+  {
+    _id: ObjectId("64c23edf9dc1fb2f85601ae5"),
+    name: 'Sleek Wooden Tuna',
+    company: ObjectId("64c23350e32f4a51b19b9235"),
+    price: 101,
+    colors: [ '#29505b' ],
+    image: '/images/product-Recycled.png',
+    category: ObjectId("64c2342de32f4a51b19b9255"),
+    isFeatured: false,
+    __v: 0
+  },
+  {
+    _id: ObjectId("64c23edf9dc1fb2f856027db"),
+    name: 'Sleek Wooden Tuna',
+    company: ObjectId("64c23350e32f4a51b19b9241"),
+    price: 363,
+    colors: [ '#464438' ],
+    image: '/images/product-Sleek.png',
+    category: ObjectId("64c2342de32f4a51b19b9256"),
+    isFeatured: false,
+    __v: 0
+  }
+]
+-----------------------------------------------------------------------------------------------
+shop> db.products.aggregate([{$match:{price:{$gt:1250}}}])
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9263"),
+    name: 'Laptop Pro',
+    company: '64c23350e32f4a51b19b9231',
+    price: 1299,
+    colors: [ '#333333', '#cccccc', '#00ff00' ],
+    image: '/images/product-laptop.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: true
+  },
+  {
+    _id: ObjectId("64c236a2e32f4a51b19b9281"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  },
+  {
+    _id: ObjectId("64c23707e32f4a51b19b9296"),
+    name: 'Diamond Ring',
+    company: '64c23350e32f4a51b19b923a',
+    price: 1999,
+    colors: [ '#000000', '#cc6600', '#663300' ],
+    image: '/images/product-diamond-ring.png',
+    category: '64c2342de32f4a51b19b9259',
+    isFeatured: false
+  }
+]
+--------------------------------------------------------------------------------------------
+//2.$group:group is used when we want sum,avg,max etc that return single value similiar as reduce method in js.
+shop> db.products.aggregate([{$group:{_id:"$company",totalProducts:{$sum:1}}}])
+[
+  { _id: '64c23350e32f4a51b19b9231', totalProducts: 6 },
+  { _id: '64c23350e32f4a51b19b9237', totalProducts: 6 },
+  { _id: '64c23350e32f4a51b19b9245', totalProducts: 2 },
+  { _id: ObjectId("64c23350e32f4a51b19b923f"), totalProducts: 323 },
+  { _id: ObjectId("64c23350e32f4a51b19b9246"), totalProducts: 305 },
+  { _id: ObjectId("64c23350e32f4a51b19b923d"), totalProducts: 337 },
+  { _id: ObjectId("64c23350e32f4a51b19b9231"), totalProducts: 333 },
+  { _id: ObjectId("64c23350e32f4a51b19b9242"), totalProducts: 309 },
+  { _id: ObjectId("64c23350e32f4a51b19b924c"), totalProducts: 335 },
+  { _id: ObjectId("64c23350e32f4a51b19b923e"), totalProducts: 381 },
+  { _id: '64c23350e32f4a51b19b9235', totalProducts: 6 },
+  { _id: '64c23350e32f4a51b19b9252', totalProducts: 2 },
+  { _id: '64c23350e32f4a51b19b924d', totalProducts: 2 },
+  { _id: ObjectId("64c23350e32f4a51b19b9233"), totalProducts: 320 },
+  { _id: '64c23350e32f4a51b19b9236', totalProducts: 6 },
+  { _id: '64c23350e32f4a51b19b924c', totalProducts: 2 },
+  { _id: '64c23350e32f4a51b19b9249', totalProducts: 2 },
+  { _id: ObjectId("64c23350e32f4a51b19b9230"), totalProducts: 319 },
+  { _id: '64c23350e32f4a51b19b9244', totalProducts: 2 },
+  { _id: ObjectId("64c23350e32f4a51b19b9235"), totalProducts: 356 }
+]
+Type "it" for more
+----------------------------------------------------------------------------------------------------
+shop> db.products.aggregate([{$match:{company:'64c23350e32f4a51b19b9245'}}])
+[
+  {
+    _id: ObjectId("64c23947e32f4a51b19b92cd"),
+    name: 'Wireless Noise-Canceling Headphones',
+    company: '64c23350e32f4a51b19b9245',
+    price: 199,
+    colors: [ '#ffffff', '#ff9900', '#0099ff' ],
+    image: '/images/product-wireless-headphones.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: true
+  },
+  {
+    _id: ObjectId("64c239b9e32f4a51b19b92ea"),
+    name: 'Smart Home Security System',
+    company: '64c23350e32f4a51b19b9245',
+    price: 399,
+    colors: [ '#333333', '#ff9900', '#990000' ],
+    image: '/images/product-smart-security-system.png',
+    category: '64c2342de32f4a51b19b925b',
+    isFeatured: false
+  }
+]
+----------------------------------------------------------------------------------------------------------
+shop> db.products.aggregate([{$group:{_id:"$company",totalProducts:{$sum:"$price"}}}])
+[
+  { _id: '64c23350e32f4a51b19b923a', totalProducts: 4884 },
+  { _id: ObjectId("64c23350e32f4a51b19b9236"), totalProducts: 168138 },
+  { _id: '64c23350e32f4a51b19b924e', totalProducts: 598 },                     //399+199=598
+  { _id: ObjectId("64c23350e32f4a51b19b9241"), totalProducts: 168643 },
+  { _id: ObjectId("64c23350e32f4a51b19b9243"), totalProducts: 164088 },
+  { _id: ObjectId("64c23350e32f4a51b19b9249"), totalProducts: 155570 },
+  { _id: '64c23350e32f4a51b19b923d', totalProducts: 324 },
+  { _id: ObjectId("64c23350e32f4a51b19b9234"), totalProducts: 180935 },
+  { _id: '64c23350e32f4a51b19b9255', totalProducts: 299 },
+  { _id: ObjectId("64c23350e32f4a51b19b9244"), totalProducts: 176680 },
+  { _id: '64c23350e32f4a51b19b923b', totalProducts: 3434 },
+  { _id: ObjectId("64c23350e32f4a51b19b924d"), totalProducts: 166591 },
+  { _id: '64c23350e32f4a51b19b923f', totalProducts: 2015 },
+  { _id: '64c23350e32f4a51b19b9241', totalProducts: 1544 },
+  { _id: '64c23350e32f4a51b19b9232', totalProducts: 1554 },
+  { _id: '64c23350e32f4a51b19b9254', totalProducts: 129 },
+  { _id: ObjectId("64c23350e32f4a51b19b923b"), totalProducts: 167937 },
+  { _id: ObjectId("64c23350e32f4a51b19b923c"), totalProducts: 177608 },
+  { _id: '64c23350e32f4a51b19b924b', totalProducts: 328 },              
+  { _id: '64c23350e32f4a51b19b9242', totalProducts: 620 }
+]
+Type "it" for more
+------------------------------------------------------------------------------------------------------------
+shop> db.products.aggregate([{$match:{price:{$gt:1200}}},{$group:{_id:"$company",totalProducts:{$sum:"$price"}}}])
+[
+  { _id: '64c23350e32f4a51b19b9231', totalProducts: 1299 },
+  { _id: '64c23350e32f4a51b19b923a', totalProducts: 3998 }
+]
+----------------------------------------------------------------------------------------------------
+//!   find the quantity = 5, group them with same quantity and find the average price
+shop> db.sales.find()
+[
+  { _id: 2, quantity: 5, price: 25, targetPrice: 100 },
+  { _id: 1, quantity: 10, price: 15, targetPrice: 120 },
+  { _id: 3, quantity: 6, price: 35, targetPrice: 100 },
+  { _id: 4, quantity: 5, price: 55, targetPrice: 150 },
+  { _id: 5, quantity: 5, price: 55, targetPrice: 150 }
+]
+
+
+shop> db.sales.aggregate([{$match:{quantity:5}},{$group:{_id:'$quantity',priceTotal:{$sum:'$price'},priceAvg:{$avg:'$price'}}}])
+[ { _id: 5, priceTotal: 135, priceAvg: 45 } ]
+
+//55+55+25=135/3=45
+-------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------
+$sort:
+shop> db.products.aggregate([{$match:{price:{$gt:1200}}},{$group:{_id:"$company",totalProducts:{$sum:"$price"}}},{$sort:{totalPrice:-1}}])
+[
+  { _id: '64c23350e32f4a51b19b923a', totalProducts: 3998 },
+  { _id: '64c23350e32f4a51b19b9231', totalProducts: 1299 }
+]
+shop> db.products.aggregate([{$match:{price:{$gt:1200}}},{$group:{_id:"$company",totalProducts:{$sum:"$price"}}},{$sort:{totalPrice:1}}])
+[
+  { _id: '64c23350e32f4a51b19b9231', totalProducts: 1299 },
+  { _id: '64c23350e32f4a51b19b923a', totalProducts: 3998 }
+]
+-----------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
+$project:
+shop> db.sales.aggregate([{$project:{price:1,_id:0}}])
+[
+  { price: 25 },
+  { price: 15 },
+  { price: 35 },
+  { price: 55 },
+  { price: 55 }
+]
+------------------------------------------------------------------------------------------------------------------
+shop> db.products.aggregate([{$project:{price:1,discountPrice:{$multiply:['$price',0.8]}}}])
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9262"),
+    price: 699,
+    discountPrice: 559.2
+  },
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9263"),
+    price: 1299,
+    discountPrice: 1039.2
+  },
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9264"),
+    price: 249,
+    discountPrice: 199.20000000000002
+  },
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9265"),
+    price: 89,
+    discountPrice: 71.2
+  },
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+//$push:
+shop> db.products.aggregate([{$match:{price:{$gt:1200}}},{$group:{_id:'$price',allColors:{$push:'$colors'}}}])
+[
+  {
+    _id: 1999,
+    allColors: [
+      [ '#000000', '#cc6600', '#663300' ],
+      [ '#000000', '#cc6600', '#663300' ]
+    ]
+  },
+  { _id: 1299, allColors: [ [ '#333333', '#cccccc', '#00ff00' ] ] }
+]
+---------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+//$unwind:destruct array
+shop> db.products.aggregate([{$unwind:'$colors'},{$match:{price:{$gt:1200}}},{$group:{_id:'$price',allColors:{$push:'$colors'}}}])
+[
+  { _id: 1299, allColors: [ '#333333', '#cccccc', '#00ff00' ] },
+  {
+    _id: 1999,
+    allColors: [
+      '#000000',
+      '#cc6600',
+      '#663300',
+      '#000000',
+      '#cc6600',
+      '#663300'
+    ]
+  }
+]
+-------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------
+//$addToSet:to avoid duplication of array
+shop> db.products.aggregate([{$unwind:'$colors'},{$match:{price:{$gt:1200}}},{$group:{_id:'$price',allColors:{$addToSet:'$colors'}}}])
+[
+  { _id: 1299, allColors: [ '#333333', '#cccccc', '#00ff00' ] },
+  { _id: 1999, allColors: [ '#cc6600', '#663300', '#000000' ] }
+]
+--------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
+//$size:Length of array
+shop> db.products.aggregate([{$match:{price:{$gt:1200}}},{$unwind:"$colors"},{$group:{_id:{priceGroup:"$price"},colors:{$addToSet:"$colors"},},},{$project:{_id:1,colors:1,colorLength:{$size:"$colors"},}}])
+[
+  {
+    _id: { priceGroup: 1299 },
+    colors: [ '#333333', '#cccccc', '#00ff00' ],
+    colorLength: 3
+  },
+  {
+    _id: { priceGroup: 1999 },
+    colors: [ '#cc6600', '#663300', '#000000' ],
+    colorLength: 3
+  }
+]
+-----------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------
+//$limit:
+shop> db.products.aggregate([{$match:{price:{$gt:1200}}},{$unwind:"$colors"},{$group:{_id:{priceGroup:"$price"},colors:{$addToSet:"$colors"},},},{$project:{_id:1,colors:1,colorLength:{$size:"$colors"},}},{$limit:1}])
+[
+  {
+    _id: { priceGroup: 1299 },
+    colors: [ '#333333', '#cccccc', '#00ff00' ],
+    colorLength: 3
+  }
+]
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+//$skip:
+shop> db.products.aggregate([{$match:{price:{$gt:1200}}},{$unwind:"$colors"},{$group:{_id:{priceGroup:"$price"},colors:{$addToSet:"$colors"},},},{$project:{_id:1,colors:1,colorLength:{$size:"$colors"},}},{$skip:1}])
+[
+  {
+    _id: { priceGroup: 1299 },
+    colors: [ '#00ff00', '#333333', '#cccccc' ],
+    colorLength: 3
+  }
+]
+----------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------
+//$filter:
+shop> db.col.aggregate([{$project:{name:1,aryanValues:{$filter:{input:'$values',as:'val',cond:{$gt:['val',30]}}}}}])
+[
+  {
+    _id: ObjectId("64c23350e32f4a51b19b9201"),
+    name: 'Document 1',
+    aryanValues: [ 10, 20, 30, 40, 50 ]
+  },
+  {
+    _id: ObjectId("64c23350e32f4a51b19b9202"),
+    name: 'Document 2',
+    aryanValues: [ 15, 25, 35, 45, 55 ]
+  },
+  {
+    _id: ObjectId("64c23350e32f4a51b19b9203"),
+    name: 'Document 3',
+    aryanValues: [ 5, 15, 25, 35, 45 ]
+  },
+  {
+    _id: ObjectId("64c23350e32f4a51b19b9204"),
+    name: 'Document 4',
+    aryanValues: [ 30, 40, 50, 60, 70 ]
+  },
+  {
+    _id: ObjectId("64c23350e32f4a51b19b9205"),
+    name: 'Document 5',
+    aryanValues: [ 25, 35, 45, 55, 65 ]
+  }
+]
+----------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
+//$filter
+shop> db.col.aggregate([{$project:{name:1,aryanValues:{$filter:{input:'$values',as:'val',cond:{$gt:['$$val',30]}}}}}])
+[
+  {
+    _id: ObjectId("64c23350e32f4a51b19b9201"),
+    name: 'Document 1',
+    aryanValues: [ 40, 50 ]
+  },
+  {
+    _id: ObjectId("64c23350e32f4a51b19b9202"),
+    name: 'Document 2',
+    aryanValues: [ 35, 45, 55 ]
+  },
+  {
+    _id: ObjectId("64c23350e32f4a51b19b9203"),
+    name: 'Document 3',
+    aryanValues: [ 35, 45 ]
+  },
+  {
+    _id: ObjectId("64c23350e32f4a51b19b9204"),
+    name: 'Document 4',
+    aryanValues: [ 40, 50, 60, 70 ]
+  },
+  {
+    _id: ObjectId("64c23350e32f4a51b19b9205"),
+    name: 'Document 5',
+    aryanValues: [ 35, 45, 55, 65 ]
+  }
+]
+---------------------------------------------------------------------------------------------------------
+//Advanced END....
